@@ -14,6 +14,8 @@
                 <x:Type TypeName="sys:DayOfWeek"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <CollectionViewSource x:Key="SortedStudents" Source="{Binding Students}">
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="Name" xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"/>
@@ -30,6 +32,7 @@
         <Grid Grid.Column="0" Margin="0,0,10,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -39,7 +42,28 @@
                        FontWeight="Light" 
                        Margin="0,0,0,10"/>
 
-            <ListBox Grid.Row="1" 
+            <!-- Search Box -->
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <TextBox x:Name="SearchTextBox" 
+                         Padding="5,3,20,3"
+                         TextChanged="SearchTextBox_TextChanged"/>
+                <TextBlock Text="Search..." 
+                           IsHitTestVisible="False" 
+                           Foreground="Gray" 
+                           Margin="7,4,0,0"
+                           Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource InverseBoolToVis}}"/>
+                <Button Content="?" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center"
+                        Margin="0,0,3,0"
+                        Width="18" Height="18"
+                        FontSize="10"
+                        Padding="0"
+                        Click="ClearSearch_Click"
+                        Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource BoolToVis}}"/>
+            </Grid>
+
+            <ListBox Grid.Row="2" 
                      x:Name="StudentsListBox"
                      ItemsSource="{Binding Source={StaticResource SortedStudents}}"
                      SelectionChanged="StudentsListBox_SelectionChanged"
@@ -61,7 +85,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <Button Content="Add" 
                         Width="60" 
                         Height="30" 
@@ -106,7 +130,13 @@
                     <!-- Groups -->
                     <TextBlock Text="Groups" FontWeight="SemiBold" Margin="0,0,0,5"/>
                     <controls:MultiSelectGroupComboBox x:Name="GroupsComboBox"
-                                                       Margin="0,0,0,15"/>
+                                                       Margin="0,0,0,5"/>
+                    <TextBlock x:Name="GroupNamesDisplay" 
+                               Text="" 
+                               Foreground="#666" 
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,15"/>
 
                     <!-- Solos Section -->
                     <TextBlock Text="Solos" FontWeight="SemiBold" Margin="0,0,0,5"/>

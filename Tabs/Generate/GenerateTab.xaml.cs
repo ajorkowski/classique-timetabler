@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using classique.timetabler.Data;
+using classique.timetabler.Dialogs;
 
 namespace classique.timetabler.Tabs.Generate
 {
@@ -33,14 +34,32 @@ namespace classique.timetabler.Tabs.Generate
             }
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            RefreshSummary();
-        }
-
         private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Timetable generation not yet implemented.", "Generate", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dialog = new SolverProgressDialog
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            var dialogResult = dialog.ShowDialog();
+
+            if (dialogResult == true && dialog.Result != null)
+            {
+                // Notify the MainWindow to update the Results tab
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.OnScheduleAccepted();
+                }
+
+                MessageBox.Show(
+                    $"Timetable generated successfully!\n\n" +
+                    $"Scheduled {dialog.Result.ScheduledClasses.Count} classes.\n" +
+                    $"Solve time: {dialog.Result.SolveTime.TotalSeconds:F2}s\n\n" +
+                    $"Go to the Results tab to view the schedule.",
+                    "Generation Complete",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
         }
 
         private void LoadWeights()
@@ -60,19 +79,19 @@ namespace classique.timetabler.Tabs.Generate
 
             var data = AppData.Current;
 
-            if (sender == AlphaTextBox && double.TryParse(AlphaTextBox.Text, out double alpha))
+            if (sender == AlphaTextBox && long.TryParse(AlphaTextBox.Text, out long alpha))
             {
                 data.AlphaMakespan = alpha;
             }
-            else if (sender == BetaTextBox && double.TryParse(BetaTextBox.Text, out double beta))
+            else if (sender == BetaTextBox && long.TryParse(BetaTextBox.Text, out long beta))
             {
                 data.BetaStudentClustering = beta;
             }
-            else if (sender == GammaTextBox && double.TryParse(GammaTextBox.Text, out double gamma))
+            else if (sender == GammaTextBox && long.TryParse(GammaTextBox.Text, out long gamma))
             {
                 data.GammaAgePriority = gamma;
             }
-            else if (sender == CrossDayTextBox && double.TryParse(CrossDayTextBox.Text, out double crossDay))
+            else if (sender == CrossDayTextBox && long.TryParse(CrossDayTextBox.Text, out long crossDay))
             {
                 data.CrossDayPenalty = crossDay;
             }

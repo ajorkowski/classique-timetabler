@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,6 +15,7 @@ namespace classique.timetabler.Tabs.Groups
         private Group? _selectedGroup;
         private bool _isUpdating;
         private bool _groupByTeacher = true;
+        private string _searchText = "";
 
         public GroupsTab()
         {
@@ -76,6 +78,41 @@ namespace classique.timetabler.Tabs.Groups
             }
         }
 
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _searchText = SearchTextBox.Text;
+            ApplyFilter();
+        }
+
+        private void ClearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            SearchTextBox.Text = "";
+        }
+
+        private void ApplyFilter()
+        {
+            var view = CollectionViewSource.GetDefaultView(GroupsListBox.ItemsSource);
+            if (view == null) return;
+
+            if (string.IsNullOrWhiteSpace(_searchText))
+            {
+                view.Filter = null;
+            }
+            else
+            {
+                view.Filter = obj =>
+                {
+                    if (obj is Group group)
+                    {
+                        return group.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+                    }
+                    return false;
+                };
+            }
+
+            view.Refresh();
+        }
+
         private void GroupByComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!IsLoaded) return;
@@ -110,7 +147,8 @@ namespace classique.timetabler.Tabs.Groups
                 view.SortDescriptions.Add(new SortDescription("FirstTeacherName", ListSortDirection.Ascending));
             }
 
-            view.Refresh();
+            // Reapply filter
+            ApplyFilter();
         }
 
         private void RefreshView()
@@ -200,8 +238,8 @@ namespace classique.timetabler.Tabs.Groups
                     return;
                 }
             }
-            // Default to 60 if not found
-            DurationComboBox.SelectedIndex = 3; // 60 minutes
+            // Default to 60 if not found (index 11 in the 5-minute interval list)
+            DurationComboBox.SelectedIndex = 11;
         }
 
         private void UpdateSchedulePanelVisibility()
@@ -267,6 +305,20 @@ namespace classique.timetabler.Tabs.Groups
             }
         }
 
+        private void StartTimePicker_TimeChanged(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdating || _selectedGroup == null) return;
+            _selectedGroup.StartTime = StartTimePicker.Time;
+            UpdateWarningPanel();
+        }
+
+        private void EndTimePicker_TimeChanged(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdating || _selectedGroup == null) return;
+            _selectedGroup.EndTime = EndTimePicker.Time;
+            UpdateWarningPanel();
+        }
+
         private void AddGroup_Click(object sender, RoutedEventArgs e)
         {
             var group = new Group 
@@ -287,6 +339,44 @@ namespace classique.timetabler.Tabs.Groups
                 _selectedGroup = null;
                 UpdateEditPanel();
             }
+        }
+    }
+
+    public class InverseBooleanToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int length)
+            {
+                return length == 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            if (value is bool b)
+            {
+                return b ? Visibility.Collapsed : Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class LengthToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int length)
+            {
+                return length > 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

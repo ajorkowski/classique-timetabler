@@ -95,6 +95,9 @@ namespace classique.timetabler.Models
                 OnPropertyChanged(nameof(ScheduleDisplay)); 
                 OnPropertyChanged(nameof(Duration));
                 OnPropertyChanged(nameof(SortableStartTime));
+                OnPropertyChanged(nameof(HasWarnings));
+                OnPropertyChanged(nameof(ValidationWarnings));
+                OnPropertyChanged(nameof(WarningsSummary));
             }
         }
 
@@ -107,6 +110,9 @@ namespace classique.timetabler.Models
                 OnPropertyChanged(nameof(EndTime)); 
                 OnPropertyChanged(nameof(ScheduleDisplay)); 
                 OnPropertyChanged(nameof(Duration));
+                OnPropertyChanged(nameof(HasWarnings));
+                OnPropertyChanged(nameof(ValidationWarnings));
+                OnPropertyChanged(nameof(WarningsSummary));
             }
         }
 
@@ -241,6 +247,12 @@ namespace classique.timetabler.Models
                 if (_isFixedTime && !_studioId.HasValue)
                 {
                     warnings.Add("No studio assigned");
+                }
+
+                // Fixed groups: end time must be after start time
+                if (_isFixedTime && _endTime <= _startTime)
+                {
+                    warnings.Add("End time must be after start time");
                 }
 
                 return warnings;

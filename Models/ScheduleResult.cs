@@ -34,7 +34,7 @@ namespace classique.timetabler.Models
         /// <summary>
         /// The objective value achieved (lower is better)
         /// </summary>
-        public double ObjectiveValue { get; set; }
+        public long ObjectiveValue { get; set; }
 
         /// <summary>
         /// The makespan value (latest end time across all classes)
@@ -44,12 +44,12 @@ namespace classique.timetabler.Models
         /// <summary>
         /// Total student gap penalty in the solution
         /// </summary>
-        public double TotalStudentGapPenalty { get; set; }
+        public long TotalStudentGapPenalty { get; set; }
 
         /// <summary>
         /// Total age priority penalty in the solution
         /// </summary>
-        public double TotalAgePenalty { get; set; }
+        public long TotalAgePenalty { get; set; }
 
         /// <summary>
         /// How long the solver took to find this solution
@@ -64,9 +64,9 @@ namespace classique.timetabler.Models
         /// <summary>
         /// The weights used when generating this schedule
         /// </summary>
-        public double AlphaMakespan { get; set; }
-        public double BetaStudentClustering { get; set; }
-        public double GammaAgePriority { get; set; }
-        public double CrossDayPenalty { get; set; }
+        public long AlphaMakespan { get; set; }
+        public long BetaStudentClustering { get; set; }
+        public long GammaAgePriority { get; set; }
+        public long CrossDayPenalty { get; set; }
     }
 }

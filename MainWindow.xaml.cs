@@ -168,10 +168,31 @@ namespace classique.timetabler
         private void StartApplication()
         {
             RefreshTabDataContexts();
+            UpdateResultsTabState();
+            
             // Hide intro screen and show main content
             IntroScreen.Visibility = Visibility.Collapsed;
             MainContent.Visibility = Visibility.Visible;
             AutoSaveService.StartWatching();
+        }
+
+        /// <summary>
+        /// Called by GenerateTab when a schedule is accepted.
+        /// </summary>
+        public void OnScheduleAccepted()
+        {
+            UpdateResultsTabState();
+        }
+
+        private void UpdateResultsTabState()
+        {
+            var hasResults = AppData.Current.ScheduledClasses.Count > 0;
+            ResultsTabItem.IsEnabled = hasResults;
+            
+            if (hasResults)
+            {
+                ResultsTab.RefreshResults();
+            }
         }
 
         private void RefreshTabDataContexts()
@@ -181,6 +202,7 @@ namespace classique.timetabler
             GroupsTab.DataContext = AppData.Current;
             StudentsTab.DataContext = AppData.Current;
             GenerateTab.DataContext = AppData.Current;
+            ResultsTab.DataContext = AppData.Current;
         }
 
         protected override void OnClosed(EventArgs e)

@@ -160,13 +160,6 @@
                     Height="40"
                     FontSize="14"
                     Click="GenerateButton_Click"/>
-            <Button x:Name="RefreshButton" 
-                    Content="Refresh" 
-                    Width="100" 
-                    Height="40"
-                    FontSize="14"
-                    Margin="10,0,0,0"
-                    Click="RefreshButton_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

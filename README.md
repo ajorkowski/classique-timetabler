@@ -1,96 +1,97 @@
 # Classique Timetabler
 
-A WPF application designed to help create optimized timetables for a dance studio.
+A WPF application designed to help create optimized timetables for a dance studio using constraint programming.
 
 ## Overview
 
-This program assists dance studios in scheduling classes by considering teachers, studios, students, and class types to generate an optimal timetable that minimizes student wait times.
+This program assists dance studios in scheduling classes by considering teachers, studios, students, and class types to generate an optimal timetable. It uses the Google OR-Tools CP-SAT solver to find schedules that minimize teaching time while clustering student activities and prioritizing younger students for earlier time slots.
 
 ## Core Concepts
 
 ### Entities
 
-- **Teachers**: Instructors who teach dance classes
-- **Studios**: Physical rooms/spaces where classes are held
+- **Teachers**: Instructors who teach dance classes, each with defined availability windows
+- **Studios**: Physical rooms/spaces where classes are held (coupled with teacher availability)
 - **Students**: Individuals enrolled in dance classes
-  - Each student has an **age** which is used for scheduling optimization
-- **Classes**: Dance sessions with the following properties:
-  - **Name**: The name of the class
-  - **Linked Teachers**: One or more teachers assigned to the class (at least one required)
-  - **Linked Studio**: The studio where the class takes place (required)
-  - **Day**: The date of the class
-  - **Start Time**: When the class begins
-  - **End Time**: When the class ends
-  - **IsBlock**: Determines the class type:
-    - `false` = Fixed class - a regular scheduled lesson at a specific time
-    - `true` = Block - a time block where multiple students can be booked consecutively (one after the other)
+  - Each student has an **age** which is used for scheduling optimization (younger students get earlier slots)
+  - Students can have **unavailability windows** for times they cannot attend
+- **Groups**: Dance classes with multiple students
+  - **Fixed Groups**: Scheduled at a specific day/time (pre-allocated)
+  - **Flexible Groups**: The solver determines when to schedule them
+- **Solos**: Individual student performances/lessons assigned to a specific teacher
 
 ### Relationships
 
-- Each student can be enrolled in multiple group classes and solos
-- Each class is taught by a teacher in a specific studio
-- Teachers and studios have availability constraints
+- Each student can be enrolled in multiple groups and have multiple solos
+- Flexible groups are assigned to a single teacher; fixed groups can have multiple teachers
+- Teachers are coupled with studios during their availability windows
 
-## Goals
+## Scheduling Problem
 
-The timetabler aims to:
+The timetable scheduling is modeled as a **constraint satisfaction and optimization problem**, similar to the flexible job shop scheduling problem.
 
-1. Schedule all classes so that students can attend all their enrolled groups and solos
-2. Minimize waiting time between classes for each student
-3. Avoid scheduling conflicts for teachers and studios
-4. Schedule younger students earlier in the day
-5. Optimize the overall timetable for the best possible experience
+### Constraints
+
+1. **Task Duration**: Each class has a fixed duration
+2. **Alternative Selection**: Each flexible class must be assigned to exactly one time slot
+3. **Teacher Availability**: Classes must fit within teacher availability windows
+4. **No Teacher Overlap**: A teacher cannot teach two classes simultaneously
+5. **No Student Overlap**: A student cannot attend two classes at the same time
+6. **Student Availability**: Classes cannot be scheduled during student unavailability windows
+7. **Makespan**: Track the latest ending time across all classes
+
+### Optimization Objectives
+
+The solver minimizes a weighted combination of:
+
+- **Alpha (Makespan)**: Prioritize finishing all classes as early as possible
+- **Beta (Student Clustering)**: Minimize gaps between a student's classes (encourages same-day scheduling)
+- **Gamma (Age Priority)**: Schedule younger students' classes earlier in the day
+- **W_cross (Cross-Day Penalty)**: High penalty for scheduling a student's classes on different days
+
+### Pre-processing
+
+Before solving:
+1. Fixed groups are identified and their time slots are subtracted from teacher availability
+2. This may split continuous availability windows into smaller segments
+3. Scheduling alternatives are generated for each flexible class based on available windows
 
 ## Application Structure
 
-The application uses a tabbed interface with the following sections:
+The application uses a tabbed interface:
 
-1. **Teachers Tab**: Configure teacher information and availability
-2. **Studios Tab**: Configure studio information and availability
-3. **Classes Tab**: Define group classes and solos
-4. **Students Tab**: Manage student information and enrollments
-5. **Generate Tab**: Generate and view the optimized timetable
+1. **Studios Tab**: Configure studio information
+2. **Teachers Tab**: Configure teacher information and availability (linked to studios)
+3. **Groups Tab**: Define group classes (fixed or flexible)
+4. **Students Tab**: Manage student information, group enrollments, solos, and unavailability
+5. **Generate Tab**: Configure optimization weights and generate the timetable
 
 ## Save and Load
 
 The application supports saving and loading your work:
 
-- **Save**: Export all configured data (teachers, studios, students, classes, and generated timetables) to a file
-- **Load**: Import previously saved configurations to continue working or make adjustments
-
-This allows users to:
-- Save work in progress and continue later
-- Create multiple timetable variations for comparison
-- Back up configurations before making major changes
-- Share configurations between different installations
+- **Auto-save**: Periodically saves your work to prevent data loss
+- **Save/Save As**: Export all configured data to a `.timetable` file
+- **Load**: Import previously saved configurations
+- **Continue**: Resume from the last auto-saved session
 
 ### File Format (.timetable)
 
 The `.timetable` file format is a compressed JSON file:
 
-1. **Data Structure**: All application data is stored in a single root class that contains:
-   - Teachers collection
-   - Studios collection
-   - Students collection
-   - Classes collection (groups and solos)
-   - Generated timetable data
+1. **Data Structure**: All application data is stored in a single root class containing:
+   - Teachers, Studios, Students, Groups collections
+   - Optimization weights (Alpha, Beta, Gamma, W_cross)
+   - Generated scheduled classes
 
-2. **Serialization Process**:
-   - The root data class is serialized to JSON
-   - The JSON is then compressed using ZIP compression
-   - The resulting file is saved with the `.timetable` extension
-
-3. **Deserialization Process**:
-   - The `.timetable` file is decompressed
-   - The JSON content is deserialized back into the root data class
-   - The application state is restored from the loaded data
-
-This format provides:
-- **Compact file sizes** through ZIP compression
-- **Human-readable data** (when unzipped) for debugging
-- **Single-file storage** for easy sharing and backup
+2. **Format**: JSON compressed with ZIP for compact file sizes
 
 ## Technology
 
 - **Framework**: WPF (.NET 10)
-- **Language**: C#
+- **Language**: C# 14
+- **Solver**: [Google OR-Tools CP-SAT](https://developers.google.com/optimization/cp/cp_solver)
+
+## Documentation
+
+See [docs/CONSTRAINT_PROBLEM.md](docs/CONSTRAINT_PROBLEM.md) for a detailed mathematical formulation of the scheduling problem.

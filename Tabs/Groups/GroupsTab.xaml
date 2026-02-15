@@ -15,6 +15,8 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis"/>
+        <local:LengthToVisibilityConverter x:Key="LengthToBoolToVis"/>
         <CollectionViewSource x:Key="GroupedGroups" Source="{Binding Groups}"/>
     </UserControl.Resources>
     <Grid Margin="10">
@@ -28,6 +30,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -38,7 +41,28 @@
                            FontWeight="Light"/>
             </DockPanel>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <!-- Search Box -->
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <TextBox x:Name="SearchTextBox" 
+                         Padding="5,3,20,3"
+                         TextChanged="SearchTextBox_TextChanged"/>
+                <TextBlock Text="Search..." 
+                           IsHitTestVisible="False" 
+                           Foreground="Gray" 
+                           Margin="7,4,0,0"
+                           Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource InverseBoolToVis}}"/>
+                <Button Content="?" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center"
+                        Margin="0,0,3,0"
+                        Width="18" Height="18"
+                        FontSize="10"
+                        Padding="0"
+                        Click="ClearSearch_Click"
+                        Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource BoolToVis}}"/>
+            </Grid>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="Group by:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                 <ComboBox x:Name="GroupByComboBox" 
                           Width="100" 
@@ -48,7 +72,7 @@
                 </ComboBox>
             </StackPanel>
 
-            <ListBox Grid.Row="2" 
+            <ListBox Grid.Row="3" 
                      x:Name="GroupsListBox"
                      ItemsSource="{Binding Source={StaticResource GroupedGroups}}"
                      SelectionChanged="GroupsListBox_SelectionChanged"
@@ -84,7 +108,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <StackPanel Grid.Row="4" Orientation="Horizontal">
                 <Button Content="Add" 
                         Width="60" 
                         Height="30" 
@@ -158,37 +182,58 @@
                         <TextBlock Text="Duration (minutes)" FontWeight="SemiBold" Margin="0,0,0,5"/>
                         <ComboBox x:Name="DurationComboBox"
                                   SelectionChanged="DurationComboBox_SelectionChanged">
+                            <ComboBoxItem Content="5" Tag="5"/>
+                            <ComboBoxItem Content="10" Tag="10"/>
                             <ComboBoxItem Content="15" Tag="15"/>
+                            <ComboBoxItem Content="20" Tag="20"/>
+                            <ComboBoxItem Content="25" Tag="25"/>
                             <ComboBoxItem Content="30" Tag="30"/>
+                            <ComboBoxItem Content="35" Tag="35"/>
+                            <ComboBoxItem Content="40" Tag="40"/>
                             <ComboBoxItem Content="45" Tag="45"/>
+                            <ComboBoxItem Content="50" Tag="50"/>
+                            <ComboBoxItem Content="55" Tag="55"/>
                             <ComboBoxItem Content="60" Tag="60"/>
+                            <ComboBoxItem Content="65" Tag="65"/>
+                            <ComboBoxItem Content="70" Tag="70"/>
+                            <ComboBoxItem Content="75" Tag="75"/>
+                            <ComboBoxItem Content="80" Tag="80"/>
+                            <ComboBoxItem Content="85" Tag="85"/>
                             <ComboBoxItem Content="90" Tag="90"/>
+                            <ComboBoxItem Content="95" Tag="95"/>
+                            <ComboBoxItem Content="100" Tag="100"/>
+                            <ComboBoxItem Content="105" Tag="105"/>
+                            <ComboBoxItem Content="110" Tag="110"/>
+                            <ComboBoxItem Content="115" Tag="115"/>
                             <ComboBoxItem Content="120" Tag="120"/>
                         </ComboBox>
                     </StackPanel>
 
                     <!-- Schedule (only visible when Fixed Time is checked) -->
                     <StackPanel x:Name="SchedulePanel" Margin="0,0,0,15">
-                        <TextBlock Text="Day" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                        <ComboBox x:Name="DayComboBox"
-                                  ItemsSource="{Binding Source={StaticResource DayOfWeekValues}}"
-                                  SelectionChanged="DayComboBox_SelectionChanged"
-                                  Margin="0,0,0,10"/>
-
+                        <TextBlock Text="Schedule" FontWeight="SemiBold" Margin="0,0,0,5"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                <TextBlock Text="Start Time" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <controls:TimeOnlyPicker x:Name="StartTimePicker"/>
+                                <TextBlock Text="Day" Foreground="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <ComboBox x:Name="DayComboBox"
+                                          ItemsSource="{Binding Source={StaticResource DayOfWeekValues}}"
+                                          SelectionChanged="DayComboBox_SelectionChanged"/>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="End Time" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <controls:TimeOnlyPicker x:Name="EndTimePicker"/>
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                <TextBlock Text="Start Time" Foreground="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <controls:TimeOnlyPicker x:Name="StartTimePicker" TimeChanged="StartTimePicker_TimeChanged"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="End Time" Foreground="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <controls:TimeOnlyPicker x:Name="EndTimePicker" TimeChanged="EndTimePicker_TimeChanged"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>

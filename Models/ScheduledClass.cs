@@ -22,9 +22,10 @@ namespace classique.timetabler.Models
         public Guid? SoloId { get; set; }
 
         /// <summary>
-        /// The student ID that owns the solo (if IsSolo is true)
+        /// The student IDs enrolled in this class.
+        /// For solos, this will have one entry. For groups, multiple entries.
         /// </summary>
-        public Guid? StudentId { get; set; }
+        public List<Guid> StudentIds { get; set; } = [];
 
         /// <summary>
         /// The group ID if IsSolo is false, null otherwise

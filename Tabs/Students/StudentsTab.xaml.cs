@@ -1,6 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using classique.timetabler.Data;
 using classique.timetabler.Models;
 
@@ -12,6 +15,7 @@ namespace classique.timetabler.Tabs.Students
         private ObservableCollection<StudentSolo> _solos = new();
         private ObservableCollection<StudentUnavailability> _unavailability = new();
         private bool _isUpdating;
+        private string _searchText = "";
 
         public ObservableCollection<Teacher> Teachers => AppData.Current.Teachers;
 
@@ -30,6 +34,41 @@ namespace classique.timetabler.Tabs.Students
         private void StudentsTab_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateEditPanelVisibility();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _searchText = SearchTextBox.Text;
+            ApplyFilter();
+        }
+
+        private void ClearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            SearchTextBox.Text = "";
+        }
+
+        private void ApplyFilter()
+        {
+            var view = CollectionViewSource.GetDefaultView(StudentsListBox.ItemsSource);
+            if (view == null) return;
+
+            if (string.IsNullOrWhiteSpace(_searchText))
+            {
+                view.Filter = null;
+            }
+            else
+            {
+                view.Filter = obj =>
+                {
+                    if (obj is Student student)
+                    {
+                        return student.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+                    }
+                    return false;
+                };
+            }
+
+            view.Refresh();
         }
 
         private void StudentsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -57,6 +96,7 @@ namespace classique.timetabler.Tabs.Students
             YearOfBirthTextBox.Text = _selectedStudent.YearOfBirth.ToString();
             UpdateAgeDisplay();
             GroupsComboBox.SelectedGroupIds = _selectedStudent.GroupIds;
+            UpdateGroupNamesDisplay();
 
             // Load solos
             _solos.Clear();
@@ -84,6 +124,22 @@ namespace classique.timetabler.Tabs.Students
             }
         }
 
+        private void UpdateGroupNamesDisplay()
+        {
+            if (_selectedStudent == null || _selectedStudent.GroupIds.Count == 0)
+            {
+                GroupNamesDisplay.Text = "No groups selected";
+            }
+            else
+            {
+                var groupNames = _selectedStudent.GroupIds
+                    .Select(id => AppData.Current.Groups.FirstOrDefault(g => g.Id == id)?.Name)
+                    .Where(name => name != null)
+                    .OrderBy(name => name);
+                GroupNamesDisplay.Text = string.Join(", ", groupNames);
+            }
+        }
+
         private void StudentNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_isUpdating || _selectedStudent == null) return;
@@ -106,6 +162,7 @@ namespace classique.timetabler.Tabs.Students
         {
             if (_isUpdating || _selectedStudent == null) return;
             _selectedStudent.NotifyGroupsChanged();
+            UpdateGroupNamesDisplay();
             RefreshListBox();
         }
 
@@ -188,6 +245,27 @@ namespace classique.timetabler.Tabs.Students
             var index = StudentsListBox.SelectedIndex;
             StudentsListBox.Items.Refresh();
             StudentsListBox.SelectedIndex = index;
+        }
+    }
+
+    public class InverseBooleanToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int length)
+            {
+                return length == 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            if (value is bool b)
+            {
+                return b ? Visibility.Collapsed : Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

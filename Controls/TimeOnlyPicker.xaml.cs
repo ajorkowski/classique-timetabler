@@ -12,6 +12,19 @@ namespace classique.timetabler.Controls
                 typeof(TimeOnlyPicker),
                 new FrameworkPropertyMetadata(new TimeOnly(9, 0), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTimeChanged));
 
+        public static readonly RoutedEvent TimeChangedEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(TimeChanged),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(TimeOnlyPicker));
+
+        public event RoutedEventHandler TimeChanged
+        {
+            add => AddHandler(TimeChangedEvent, value);
+            remove => RemoveHandler(TimeChangedEvent, value);
+        }
+
         public TimeOnly Time
         {
             get => (TimeOnly)GetValue(TimeProperty);
@@ -30,11 +43,11 @@ namespace classique.timetabler.Controls
                 HourComboBox.Items.Add(i.ToString());
             }
 
-            // Populate minutes (00, 15, 30, 45)
-            MinuteComboBox.Items.Add("00");
-            MinuteComboBox.Items.Add("15");
-            MinuteComboBox.Items.Add("30");
-            MinuteComboBox.Items.Add("45");
+            // Populate minutes (00, 05, 10, ..., 55) in 5-minute intervals
+            for (int i = 0; i < 60; i += 5)
+            {
+                MinuteComboBox.Items.Add(i.ToString("D2"));
+            }
 
             Loaded += (s, e) => UpdateControlsFromTime();
         }
@@ -62,16 +75,9 @@ namespace classique.timetabler.Controls
 
             HourComboBox.SelectedItem = hour12.ToString();
             
-            // Find closest minute option
-            var minuteIndex = minute switch
-            {
-                < 8 => 0,   // 00
-                < 23 => 1,  // 15
-                < 38 => 2,  // 30
-                < 53 => 3,  // 45
-                _ => 0      // 00 (next hour, but we'll just show 00)
-            };
-            MinuteComboBox.SelectedIndex = minuteIndex;
+            // Round to nearest 5-minute interval
+            var roundedMinute = (int)(Math.Round(minute / 5.0) * 5) % 60;
+            MinuteComboBox.SelectedItem = roundedMinute.ToString("D2");
             
             AmPmComboBox.SelectedIndex = isPm ? 1 : 0;
 
@@ -100,6 +106,9 @@ namespace classique.timetabler.Controls
             Time = new TimeOnly(hour, minute);
 
             _isUpdating = false;
+
+            // Raise the TimeChanged event
+            RaiseEvent(new RoutedEventArgs(TimeChangedEvent, this));
         }
     }
 }

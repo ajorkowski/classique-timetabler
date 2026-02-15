@@ -9,8 +9,9 @@
         xmlns:students="clr-namespace:classique.timetabler.Tabs.Students"
         xmlns:groups="clr-namespace:classique.timetabler.Tabs.Groups"
         xmlns:generate="clr-namespace:classique.timetabler.Tabs.Generate"
+        xmlns:results="clr-namespace:classique.timetabler.Tabs.Results"
         mc:Ignorable="d"
-        Title="Classique Timetabler" Height="550" Width="800"
+        Title="Classique Time Table Builder" Height="700" Width="1100"
         WindowStartupLocation="CenterScreen">
     <Grid Background="White">
         <!-- Introduction Screen -->
@@ -22,7 +23,7 @@
                        Margin="0,0,0,20"
                        HorizontalAlignment="Center"/>
                 
-                <TextBlock Text="Classique Timetabler" 
+                <TextBlock Text="Classique Time Table Builder" 
                            FontSize="36" 
                            FontWeight="Light" 
                            HorizontalAlignment="Center" 
@@ -95,6 +96,9 @@
                 </TabItem>
                 <TabItem Header="Generate">
                     <generate:GenerateTab x:Name="GenerateTab"/>
+                </TabItem>
+                <TabItem x:Name="ResultsTabItem" Header="Results">
+                    <results:ResultsTab x:Name="ResultsTab"/>
                 </TabItem>
             </TabControl>
         </Grid>
