@@ -1,0 +1,212 @@
+<UserControl x:Class="classique.timetabler.Tabs.Groups.GroupsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:classique.timetabler.Tabs.Groups"
+             xmlns:controls="clr-namespace:classique.timetabler.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="DayOfWeekValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sys:DayOfWeek"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <CollectionViewSource x:Key="GroupedGroups" Source="{Binding Groups}"/>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Groups List -->
+        <Grid Grid.Column="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel Margin="0,0,0,10">
+                <TextBlock Text="Groups / Trios / Duos" 
+                           FontSize="24" 
+                           FontWeight="Light"/>
+            </DockPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Group by:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox x:Name="GroupByComboBox" 
+                          Width="100" 
+                          SelectionChanged="GroupByComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Teacher" IsSelected="True"/>
+                    <ComboBoxItem Content="Day"/>
+                </ComboBox>
+            </StackPanel>
+
+            <ListBox Grid.Row="2" 
+                     x:Name="GroupsListBox"
+                     ItemsSource="{Binding Source={StaticResource GroupedGroups}}"
+                     SelectionChanged="GroupsListBox_SelectionChanged"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     Margin="0,0,0,10">
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Border Background="#E0E0E0" Padding="5,3" Margin="0,5,0,0">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                </Border>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#9888; " Foreground="#B8860B" 
+                                           Visibility="{Binding HasWarnings, Converter={StaticResource BoolToVis}}"
+                                           ToolTip="{Binding WarningsSummary}"/>
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                <TextBlock Text=" (" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding StudentCount}" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
+                                <TextBlock Text=" students)" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding TeacherNames}" Foreground="Gray" FontSize="11"/>
+                            <TextBlock Text="{Binding ScheduleDisplay}" Foreground="Gray" FontSize="11"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <Button Content="Add" 
+                        Width="60" 
+                        Height="30" 
+                        Margin="0,0,10,0"
+                        Click="AddGroup_Click"/>
+                <Button Content="Remove" 
+                        Width="60" 
+                        Height="30"
+                        Click="RemoveGroup_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Group Details / Edit Panel -->
+        <Grid Grid.Column="1" x:Name="EditPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Group Details" 
+                       FontSize="24" 
+                       FontWeight="Light" 
+                       Margin="0,0,0,10"/>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Warning Panel -->
+                    <Border x:Name="WarningPanel" 
+                            Background="#FFF3CD" 
+                            BorderBrush="#FFE69C" 
+                            BorderThickness="1" 
+                            Padding="10" 
+                            Margin="0,0,0,15"
+                            Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#9888; " Foreground="#856404" FontWeight="Bold"/>
+                            <TextBlock x:Name="WarningText" Foreground="#856404" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Name -->
+                    <TextBlock Text="Name" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="GroupNameTextBox" 
+                             Margin="0,0,0,15"
+                             TextChanged="GroupNameTextBox_TextChanged"/>
+
+                    <!-- Teachers -->
+                    <TextBlock Text="Teacher (required)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <controls:MultiSelectTeacherComboBox x:Name="TeachersComboBox"
+                                                         Margin="0,0,0,15"
+                                                         SelectionChanged="TeachersComboBox_SelectionChanged"/>
+
+                    <!-- Fixed Time -->
+                    <CheckBox x:Name="IsFixedTimeCheckBox" 
+                              Content="Fixed Time (uncheck if schedule is flexible)"
+                              Margin="0,0,0,15"
+                              Checked="IsFixedTimeCheckBox_Changed"
+                              Unchecked="IsFixedTimeCheckBox_Changed"/>
+
+                    <!-- Studio (only visible when Fixed Time is checked) -->
+                    <StackPanel x:Name="StudioPanel" Margin="0,0,0,15">
+                        <TextBlock Text="Studio (required for fixed time)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="StudioComboBox"
+                                  DisplayMemberPath="Name"
+                                  SelectedValuePath="Id"
+                                  SelectionChanged="StudioComboBox_SelectionChanged"/>
+                    </StackPanel>
+
+                    <!-- Duration (only visible when Flexible) -->
+                    <StackPanel x:Name="DurationPanel" Margin="0,0,0,15">
+                        <TextBlock Text="Duration (minutes)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="DurationComboBox"
+                                  SelectionChanged="DurationComboBox_SelectionChanged">
+                            <ComboBoxItem Content="15" Tag="15"/>
+                            <ComboBoxItem Content="30" Tag="30"/>
+                            <ComboBoxItem Content="45" Tag="45"/>
+                            <ComboBoxItem Content="60" Tag="60"/>
+                            <ComboBoxItem Content="90" Tag="90"/>
+                            <ComboBoxItem Content="120" Tag="120"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Schedule (only visible when Fixed Time is checked) -->
+                    <StackPanel x:Name="SchedulePanel" Margin="0,0,0,15">
+                        <TextBlock Text="Day" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="DayComboBox"
+                                  ItemsSource="{Binding Source={StaticResource DayOfWeekValues}}"
+                                  SelectionChanged="DayComboBox_SelectionChanged"
+                                  Margin="0,0,0,10"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Start Time" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <controls:TimeOnlyPicker x:Name="StartTimePicker"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="End Time" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <controls:TimeOnlyPicker x:Name="EndTimePicker"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Students in Group -->
+                    <TextBlock Text="Students in Group" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <Border Background="#F5F5F5" 
+                            BorderBrush="#E0E0E0" 
+                            BorderThickness="1" 
+                            Padding="10" 
+                            Margin="0,0,0,15"
+                            MinHeight="60">
+                        <TextBlock x:Name="StudentsInGroupText" 
+                                   TextWrapping="Wrap" 
+                                   Foreground="#555"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

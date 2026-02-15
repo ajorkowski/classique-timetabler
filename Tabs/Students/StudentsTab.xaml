@@ -1,0 +1,206 @@
+<UserControl x:Class="classique.timetabler.Tabs.Students.StudentsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:classique.timetabler.Tabs.Students"
+             xmlns:controls="clr-namespace:classique.timetabler.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="DayOfWeekValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sys:DayOfWeek"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <CollectionViewSource x:Key="SortedStudents" Source="{Binding Students}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Name" xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Students List -->
+        <Grid Grid.Column="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Students" 
+                       FontSize="24" 
+                       FontWeight="Light" 
+                       Margin="0,0,0,10"/>
+
+            <ListBox Grid.Row="1" 
+                     x:Name="StudentsListBox"
+                     ItemsSource="{Binding Source={StaticResource SortedStudents}}"
+                     SelectionChanged="StudentsListBox_SelectionChanged"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     Margin="0,0,0,10">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            <TextBlock Foreground="Gray" FontSize="11">
+                                <Run Text="Age:"/>
+                                <Run Text="{Binding Age, Mode=OneWay}"/>
+                                <Run Text=" | Groups:"/>
+                                <Run Text="{Binding GroupIds.Count, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding SolosSummary}" Foreground="Gray" FontSize="11"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button Content="Add" 
+                        Width="60" 
+                        Height="30" 
+                        Margin="0,0,10,0"
+                        Click="AddStudent_Click"/>
+                <Button Content="Remove" 
+                        Width="60" 
+                        Height="30"
+                        Click="RemoveStudent_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Student Details / Edit Panel -->
+        <Grid Grid.Column="1" x:Name="EditPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Student Details" 
+                       FontSize="24" 
+                       FontWeight="Light" 
+                       Margin="0,0,0,10"/>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Name -->
+                    <TextBlock Text="Name" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="StudentNameTextBox" 
+                             Margin="0,0,0,15"
+                             TextChanged="StudentNameTextBox_TextChanged"/>
+
+                    <!-- Year of Birth -->
+                    <TextBlock Text="Year of Birth" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <TextBox x:Name="YearOfBirthTextBox" 
+                                 Width="80"
+                                 TextChanged="YearOfBirthTextBox_TextChanged"/>
+                        <TextBlock x:Name="AgeDisplay" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="Gray"/>
+                    </StackPanel>
+
+                    <!-- Groups -->
+                    <TextBlock Text="Groups" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <controls:MultiSelectGroupComboBox x:Name="GroupsComboBox"
+                                                       Margin="0,0,0,15"/>
+
+                    <!-- Solos Section -->
+                    <TextBlock Text="Solos" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <DataGrid x:Name="SolosDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectionMode="Single"
+                              Height="150"
+                              Margin="0,0,0,5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" 
+                                                Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                                Width="*"/>
+                            <DataGridTemplateColumn Header="Duration (min)" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DurationMinutes}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding DurationMinutes, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Teacher" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TeacherName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.Teachers, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                  SelectedValue="{Binding TeacherId, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Id"
+                                                  DisplayMemberPath="Name"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <Button Content="Add Solo" Width="80" Height="25" Margin="0,0,10,0" Click="AddSolo_Click"/>
+                        <Button Content="Remove Solo" Width="80" Height="25" Click="RemoveSolo_Click"/>
+                    </StackPanel>
+
+                    <!-- Unavailability Section -->
+                    <TextBlock Text="Unavailability" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <DataGrid x:Name="UnavailabilityDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectionMode="Single"
+                              Height="150"
+                              Margin="0,0,0,5">
+                        <DataGrid.Columns>
+                            <DataGridComboBoxColumn Header="Day"
+                                                    SelectedItemBinding="{Binding Day, UpdateSourceTrigger=PropertyChanged}"
+                                                    ItemsSource="{Binding Source={StaticResource DayOfWeekValues}}"
+                                                    Width="*"/>
+                            <DataGridTemplateColumn Header="Start" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding StartTime, StringFormat='{}{0:h:mm tt}'}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <controls:TimeOnlyPicker Time="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="End" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding EndTime, StringFormat='{}{0:h:mm tt}'}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <controls:TimeOnlyPicker Time="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <Button Content="Add Slot" Width="80" Height="25" Margin="0,0,10,0" Click="AddUnavailability_Click"/>
+                        <Button Content="Remove Slot" Width="80" Height="25" Click="RemoveUnavailability_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

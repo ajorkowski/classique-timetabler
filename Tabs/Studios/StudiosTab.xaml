@@ -1,0 +1,48 @@
+<UserControl x:Class="classique.timetabler.Tabs.Studios.StudiosTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:classique.timetabler.Tabs.Studios"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Studios" 
+                   FontSize="24" 
+                   FontWeight="Light" 
+                   Margin="0,0,0,10"/>
+
+        <DataGrid Grid.Row="1" 
+                  x:Name="StudiosDataGrid"
+                  ItemsSource="{Binding Studios}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  SelectionMode="Single"
+                  Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" 
+                                    Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Content="Add Studio" 
+                    Width="100" 
+                    Height="30" 
+                    Margin="0,0,10,0"
+                    Click="AddStudio_Click"/>
+            <Button Content="Remove" 
+                    Width="100" 
+                    Height="30"
+                    Click="RemoveStudio_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
