@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ClassiqueTimetabler.Maui.AppShell"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Title="Classique Timetabler">
+
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate HomePage}"
+        Route="Home" />
+    
+    <ShellContent
+        Title="Main"
+        ContentTemplate="{DataTemplate MainPage}"
+        Route="Main" />
+
+</Shell>

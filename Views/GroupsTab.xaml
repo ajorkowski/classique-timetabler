@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClassiqueTimetabler.Maui.Views.GroupsTab">
+    <Grid Margin="10" ColumnSpacing="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Groups List -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Text="Groups / Trios / Duos" 
+                   FontSize="24" 
+                   FontAttributes="None"
+                   Margin="0,0,0,10"/>
+
+            <!-- Search Box -->
+            <Border Grid.Row="1" 
+                    Stroke="{StaticResource Gray200}" 
+                    StrokeShape="RoundRectangle 4"
+                    Padding="8,0"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Entry x:Name="SearchEntry" 
+                           Placeholder="Search..."
+                           ClearButtonVisibility="WhileEditing"
+                           TextChanged="SearchEntry_TextChanged"/>
+                </Grid>
+            </Border>
+
+            <!-- Group By -->
+            <HorizontalStackLayout Grid.Row="2" Margin="0,0,0,10" Spacing="8">
+                <Label Text="Group by:" VerticalOptions="Center"/>
+                <Picker x:Name="GroupByPicker" 
+                        WidthRequest="120"
+                        SelectedIndexChanged="GroupByPicker_SelectedIndexChanged">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Teacher</x:String>
+                            <x:String>Day</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </HorizontalStackLayout>
+
+            <CollectionView Grid.Row="3" 
+                            x:Name="GroupsCollectionView"
+                            SelectionMode="Single"
+                            SelectionChanged="GroupsCollectionView_SelectionChanged"
+                            Margin="0,0,0,10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="{StaticResource Gray200}" 
+                                StrokeShape="RoundRectangle 4"
+                                Padding="10"
+                                Margin="0,0,0,5"
+                                BackgroundColor="White">
+                            <VerticalStackLayout Spacing="2">
+                                <HorizontalStackLayout>
+                                    <Label Text="⚠ " 
+                                           TextColor="#B8860B"
+                                           IsVisible="{Binding HasWarnings}"/>
+                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                    <Label Text=" (" TextColor="Gray" FontSize="11"/>
+                                    <Label Text="{Binding StudentCount}" TextColor="Gray" FontSize="11"/>
+                                    <Label Text=" students)" TextColor="Gray" FontSize="11"/>
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding TeacherNames}" TextColor="Gray" FontSize="11"/>
+                                <Label Text="{Binding ScheduleDisplay}" TextColor="Gray" FontSize="11"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <HorizontalStackLayout Grid.Row="4" Spacing="10">
+                <Button Text="Add" 
+                        WidthRequest="80"
+                        Clicked="AddGroup_Clicked"/>
+                <Button Text="Remove" 
+                        WidthRequest="80"
+                        BackgroundColor="{StaticResource Gray500}"
+                        Clicked="RemoveGroup_Clicked"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Group Details / Edit Panel -->
+        <Grid Grid.Column="1" x:Name="EditPanel" IsVisible="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Text="Group Details" 
+                   FontSize="24" 
+                   FontAttributes="None" 
+                   Margin="0,0,0,10"/>
+
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="5">
+                    <!-- Warning Panel -->
+                    <Border x:Name="WarningPanel" 
+                            BackgroundColor="#FFF3CD" 
+                            Stroke="#FFE69C" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10" 
+                            Margin="0,0,0,15"
+                            IsVisible="False">
+                        <HorizontalStackLayout>
+                            <Label Text="⚠ " TextColor="#856404" FontAttributes="Bold"/>
+                            <Label x:Name="WarningText" TextColor="#856404"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Name -->
+                    <Label Text="Name" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <Border Stroke="{StaticResource Gray200}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="8,0"
+                            Margin="0,0,0,15">
+                        <Entry x:Name="GroupNameEntry" TextChanged="GroupNameEntry_TextChanged"/>
+                    </Border>
+
+                    <!-- Teacher Selection -->
+                    <Label Text="Teachers" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <Border Stroke="{StaticResource Gray200}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10"
+                            Margin="0,0,0,15"
+                            MinimumHeightRequest="80">
+                        <VerticalStackLayout x:Name="TeacherCheckboxes" Spacing="5"/>
+                    </Border>
+
+                    <!-- Fixed Time -->
+                    <HorizontalStackLayout Margin="0,0,0,15" Spacing="10">
+                        <CheckBox x:Name="IsFixedTimeCheckBox" CheckedChanged="IsFixedTimeCheckBox_CheckedChanged"/>
+                        <Label Text="Fixed Time (uncheck if schedule is flexible)" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Studio (only visible when Fixed Time is checked) -->
+                    <VerticalStackLayout x:Name="StudioPanel" Margin="0,0,0,15">
+                        <Label Text="Studio (required for fixed time)" FontAttributes="Bold" Margin="0,0,0,5"/>
+                        <Border Stroke="{StaticResource Gray200}" 
+                                StrokeShape="RoundRectangle 4"
+                                Padding="8,0">
+                            <Picker x:Name="StudioPicker"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    SelectedIndexChanged="StudioPicker_SelectedIndexChanged"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Duration (only visible when Flexible) -->
+                    <VerticalStackLayout x:Name="DurationPanel" Margin="0,0,0,15">
+                        <Label Text="Duration (minutes)" FontAttributes="Bold" Margin="0,0,0,5"/>
+                        <Border Stroke="{StaticResource Gray200}" 
+                                StrokeShape="RoundRectangle 4"
+                                Padding="8,0">
+                            <Picker x:Name="DurationPicker" SelectedIndexChanged="DurationPicker_SelectedIndexChanged">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:Int32}">
+                                        <x:Int32>5</x:Int32>
+                                        <x:Int32>10</x:Int32>
+                                        <x:Int32>15</x:Int32>
+                                        <x:Int32>20</x:Int32>
+                                        <x:Int32>25</x:Int32>
+                                        <x:Int32>30</x:Int32>
+                                        <x:Int32>35</x:Int32>
+                                        <x:Int32>40</x:Int32>
+                                        <x:Int32>45</x:Int32>
+                                        <x:Int32>50</x:Int32>
+                                        <x:Int32>55</x:Int32>
+                                        <x:Int32>60</x:Int32>
+                                        <x:Int32>65</x:Int32>
+                                        <x:Int32>70</x:Int32>
+                                        <x:Int32>75</x:Int32>
+                                        <x:Int32>80</x:Int32>
+                                        <x:Int32>85</x:Int32>
+                                        <x:Int32>90</x:Int32>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Schedule (only visible when Fixed Time is checked) -->
+                    <VerticalStackLayout x:Name="SchedulePanel" Margin="0,0,0,15">
+                        <Label Text="Schedule" FontAttributes="Bold" Margin="0,0,0,5"/>
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Day" TextColor="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <Border Stroke="{StaticResource Gray200}" 
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="8,0">
+                                    <Picker x:Name="DayPicker" SelectedIndexChanged="DayPicker_SelectedIndexChanged">
+                                        <Picker.ItemsSource>
+                                            <x:Array Type="{x:Type x:String}">
+                                                <x:String>Sunday</x:String>
+                                                <x:String>Monday</x:String>
+                                                <x:String>Tuesday</x:String>
+                                                <x:String>Wednesday</x:String>
+                                                <x:String>Thursday</x:String>
+                                                <x:String>Friday</x:String>
+                                                <x:String>Saturday</x:String>
+                                            </x:Array>
+                                        </Picker.ItemsSource>
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Start Time" TextColor="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <Border Stroke="{StaticResource Gray200}" 
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="8,0">
+                                    <TimePicker x:Name="StartTimePicker" PropertyChanged="StartTimePicker_PropertyChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2">
+                                <Label Text="End Time" TextColor="#666" FontSize="11" Margin="0,0,0,3"/>
+                                <Border Stroke="{StaticResource Gray200}" 
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="8,0">
+                                    <TimePicker x:Name="EndTimePicker" PropertyChanged="EndTimePicker_PropertyChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Students in Group -->
+                    <Label Text="Students in Group" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <Border BackgroundColor="#F5F5F5" 
+                            Stroke="{StaticResource Gray200}"
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10" 
+                            MinimumHeightRequest="60">
+                        <Label x:Name="StudentsInGroupLabel" 
+                               TextColor="#555"/>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentView>

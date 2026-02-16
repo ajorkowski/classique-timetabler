@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ClassiqueTimetabler.Maui.Pages.MainPage"
+             Title="Timetabler"
+             BackgroundColor="White">
+    
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" 
+                               Padding="10" 
+                               Spacing="10"
+                               BackgroundColor="#F5F5F5">
+            <Button Text="Save" Clicked="SaveButton_Clicked" Padding="10,5"/>
+            <Button Text="Save As..." Clicked="SaveAsButton_Clicked" Padding="10,5"/>
+            <BoxView WidthRequest="1" BackgroundColor="Gray" Margin="5,0"/>
+            <Button Text="Back to Start" Clicked="BackToStartButton_Clicked" Padding="10,5"/>
+        </HorizontalStackLayout>
+        
+        <!-- Tab Headers -->
+        <HorizontalStackLayout Grid.Row="1" 
+                               Padding="10,5" 
+                               Spacing="5"
+                               BackgroundColor="White">
+            <Button x:Name="StudiosTabButton" 
+                    Text="Studios" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+            <Button x:Name="TeachersTabButton" 
+                    Text="Teachers" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="#F0F0F0"
+                    TextColor="{StaticResource Gray900}"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+            <Button x:Name="GroupsTabButton" 
+                    Text="Groups" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="#F0F0F0"
+                    TextColor="{StaticResource Gray900}"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+            <Button x:Name="StudentsTabButton" 
+                    Text="Students" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="#F0F0F0"
+                    TextColor="{StaticResource Gray900}"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+            <Button x:Name="GenerateTabButton" 
+                    Text="Generate" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="#F0F0F0"
+                    TextColor="{StaticResource Gray900}"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+            <Button x:Name="ResultsTabButton" 
+                    Text="Results" 
+                    Clicked="TabButton_Clicked"
+                    BackgroundColor="#F0F0F0"
+                    TextColor="{StaticResource Gray900}"
+                    BorderWidth="0"
+                    CornerRadius="4"
+                    Padding="15,8"/>
+        </HorizontalStackLayout>
+        
+        <!-- Tab Content -->
+        <ContentView Grid.Row="2" x:Name="TabContent">
+            <StudiosTab x:Name="StudiosTabView"/>
+        </ContentView>
+    </Grid>
+    
+</ContentPage>

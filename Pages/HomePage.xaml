@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ClassiqueTimetabler.Maui.Pages.HomePage"
+             Title="Home"
+             BackgroundColor="White">
+    
+    <VerticalStackLayout VerticalOptions="Center" 
+                         HorizontalOptions="Center"
+                         Spacing="10">
+        
+        <Image Source="logo.png" 
+               WidthRequest="150" 
+               HeightRequest="150" 
+               Margin="0,0,0,20"
+               HorizontalOptions="Center"/>
+        
+        <Label Text="Classique Time Table Builder" 
+               FontSize="36" 
+               FontAttributes="None"
+               HorizontalOptions="Center" 
+               Margin="0,0,0,10"/>
+        
+        <Label Text="Dance Studio Scheduling Made Simple" 
+               FontSize="14" 
+               TextColor="Gray" 
+               HorizontalOptions="Center" 
+               Margin="0,0,0,40"/>
+        
+        <Button x:Name="StartNewButton" 
+                Text="Start New" 
+                WidthRequest="200" 
+                HeightRequest="40" 
+                Margin="0,10" 
+                Clicked="StartNewButton_Clicked"/>
+        
+        <Button x:Name="ContinueButton" 
+                Text="Continue" 
+                WidthRequest="200" 
+                HeightRequest="40" 
+                Margin="0,10" 
+                Clicked="ContinueButton_Clicked"
+                IsEnabled="False"/>
+        
+        <Button x:Name="LoadButton" 
+                Text="Load" 
+                WidthRequest="200" 
+                HeightRequest="40" 
+                Margin="0,10" 
+                Clicked="LoadButton_Clicked"/>
+        
+    </VerticalStackLayout>
+    
+</ContentPage>

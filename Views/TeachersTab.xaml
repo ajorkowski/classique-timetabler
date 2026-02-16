@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView x:Class="ClassiqueTimetabler.Maui.Views.TeachersTab">
+    
+    <Grid Padding="10" ColumnDefinitions="*,2*" ColumnSpacing="20">
+        
+        <!-- Teachers List (Left) -->
+        <Grid RowDefinitions="Auto,*,Auto">
+            
+            <Label Text="Teachers" 
+                   FontSize="24" 
+                   Margin="0,0,0,10"/>
+
+            <CollectionView Grid.Row="1" 
+                            x:Name="TeachersCollectionView"
+                            SelectionMode="Single"
+                            SelectionChanged="TeachersCollectionView_SelectionChanged"
+                            Margin="0,0,0,10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="Teacher">
+                        <Border Stroke="#E0E0E0" 
+                                StrokeThickness="1" 
+                                Padding="10"
+                                Margin="0,0,0,5">
+                            <VerticalStackLayout>
+                                <HorizontalStackLayout>
+                                    <Label Text="⚠ " 
+                                           TextColor="#B8860B"
+                                           IsVisible="{Binding HasWarnings}"/>
+                                    <Label Text="{Binding Name}" 
+                                           FontAttributes="Bold"/>
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding WorkloadSummary}" 
+                                       TextColor="Gray" 
+                                       FontSize="11"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <HorizontalStackLayout Grid.Row="2" Spacing="10">
+                <Button Text="Add" 
+                        WidthRequest="80" 
+                        HeightRequest="35"
+                        Clicked="AddTeacher_Clicked"/>
+                <Button Text="Remove" 
+                        WidthRequest="80" 
+                        HeightRequest="35"
+                        Clicked="RemoveTeacher_Clicked"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Teacher Details / Availability (Right) -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto">
+            
+            <Label Text="Availability" 
+                   FontSize="24" 
+                   Margin="0,0,0,10"/>
+
+            <!-- Teacher Name -->
+            <HorizontalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,10">
+                <Label Text="Teacher Name:" VerticalOptions="Center"/>
+                <Entry x:Name="TeacherNameEntry" 
+                       WidthRequest="200"
+                       TextChanged="TeacherNameEntry_TextChanged"/>
+            </HorizontalStackLayout>
+
+            <!-- Workload Summary Panel -->
+            <Border x:Name="WorkloadPanel" 
+                    Grid.Row="2" 
+                    BackgroundColor="#E8F4FD" 
+                    Stroke="#B8D4E8" 
+                    StrokeThickness="1" 
+                    Padding="10" 
+                    Margin="0,0,0,10"
+                    IsVisible="False">
+                <Grid ColumnDefinitions="*,*,*">
+                    <VerticalStackLayout>
+                        <Label Text="Groups" FontAttributes="Bold" TextColor="#2C5282"/>
+                        <Label x:Name="GroupsCountLabel" TextColor="#2C5282"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Solos" FontAttributes="Bold" TextColor="#2C5282"/>
+                        <Label x:Name="SolosCountLabel" TextColor="#2C5282"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Total / Available" FontAttributes="Bold" TextColor="#2C5282"/>
+                        <Label x:Name="TotalWorkloadLabel" TextColor="#2C5282"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Warning Panel -->
+            <Border x:Name="WarningPanel" 
+                    Grid.Row="3" 
+                    BackgroundColor="#FFF3CD" 
+                    Stroke="#FFE69C" 
+                    StrokeThickness="1" 
+                    Padding="10" 
+                    Margin="0,0,0,10"
+                    IsVisible="False">
+                <HorizontalStackLayout>
+                    <Label Text="⚠ " TextColor="#856404" FontAttributes="Bold"/>
+                    <Label x:Name="WarningLabel" TextColor="#856404"/>
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Availability Header -->
+            <Border Grid.Row="4" BackgroundColor="#F0F0F0" Padding="10" Margin="0,0,0,5">
+                <Grid ColumnDefinitions="*,*,*,*">
+                    <Label Text="Studio" FontAttributes="Bold"/>
+                    <Label Grid.Column="1" Text="Day" FontAttributes="Bold"/>
+                    <Label Grid.Column="2" Text="Start" FontAttributes="Bold"/>
+                    <Label Grid.Column="3" Text="End" FontAttributes="Bold"/>
+                </Grid>
+            </Border>
+            
+            <!-- Availability List -->
+            <CollectionView Grid.Row="5" 
+                            x:Name="AvailabilityCollectionView"
+                            SelectionMode="Single"
+                            SelectionChanged="AvailabilityCollectionView_SelectionChanged"
+                            Margin="0,0,0,10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="TeacherAvailability">
+                        <Border Stroke="#E0E0E0" 
+                                StrokeThickness="1" 
+                                Padding="10"
+                                Margin="0,0,0,3">
+                            <Grid ColumnDefinitions="*,*,*,*">
+                                <Label Text="{Binding StudioName}"/>
+                                <Label Grid.Column="1" Text="{Binding Day}"/>
+                                <Label Grid.Column="2" Text="{Binding StartTime, StringFormat='{0:h\\:mm tt}'}"/>
+                                <Label Grid.Column="3" Text="{Binding EndTime, StringFormat='{0:h\\:mm tt}'}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Edit Panel for selected availability -->
+            <Border x:Name="EditPanel" 
+                    Grid.Row="6" 
+                    BackgroundColor="#F8F8F8" 
+                    Stroke="#D0D0D0" 
+                    StrokeThickness="1" 
+                    Padding="10" 
+                    Margin="0,0,0,10"
+                    IsVisible="False">
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                    <VerticalStackLayout>
+                        <Label Text="Studio" FontSize="12" TextColor="Gray"/>
+                        <Picker x:Name="StudioPicker" 
+                                SelectedIndexChanged="StudioPicker_SelectedIndexChanged"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Day" FontSize="12" TextColor="Gray"/>
+                        <Picker x:Name="DayPicker" 
+                                SelectedIndexChanged="DayPicker_SelectedIndexChanged">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Sunday</x:String>
+                                    <x:String>Monday</x:String>
+                                    <x:String>Tuesday</x:String>
+                                    <x:String>Wednesday</x:String>
+                                    <x:String>Thursday</x:String>
+                                    <x:String>Friday</x:String>
+                                    <x:String>Saturday</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Start Time" FontSize="12" TextColor="Gray"/>
+                        <TimePicker x:Name="StartTimePicker" 
+                                    Format="h:mm tt"
+                                    PropertyChanged="StartTimePicker_PropertyChanged"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="3">
+                        <Label Text="End Time" FontSize="12" TextColor="Gray"/>
+                        <TimePicker x:Name="EndTimePicker" 
+                                    Format="h:mm tt"
+                                    PropertyChanged="EndTimePicker_PropertyChanged"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Add/Remove Availability Buttons -->
+            <HorizontalStackLayout Grid.Row="7" Spacing="10">
+                <Button Text="Add Slot" 
+                        WidthRequest="100" 
+                        HeightRequest="35"
+                        Clicked="AddAvailability_Clicked"/>
+                <Button Text="Remove Slot" 
+                        WidthRequest="100" 
+                        HeightRequest="35"
+                        Clicked="RemoveAvailability_Clicked"/>
+            </HorizontalStackLayout>
+        </Grid>
+        
+    </Grid>
+    
+</ContentView>

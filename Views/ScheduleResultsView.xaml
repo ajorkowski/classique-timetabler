@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClassiqueTimetabler.Maui.Views.ScheduleResultsView">
+    <Grid RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- View Mode Selector -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="10">
+            <Label Text="View by:" VerticalOptions="Center"/>
+            <Picker x:Name="ViewModePicker" 
+                    WidthRequest="150"
+                    SelectedIndexChanged="ViewModePicker_SelectedIndexChanged">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Day</x:String>
+                        <x:String>Teacher</x:String>
+                        <x:String>Studio</x:String>
+                        <x:String>Student</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+            
+            <!-- Filter for Student view -->
+            <Label x:Name="StudentFilterLabel" 
+                   Text="Student:" 
+                   VerticalOptions="Center" 
+                   IsVisible="False"/>
+            <Picker x:Name="StudentFilterPicker" 
+                    WidthRequest="200" 
+                    IsVisible="False"
+                    SelectedIndexChanged="StudentFilterPicker_SelectedIndexChanged"/>
+        </HorizontalStackLayout>
+
+        <!-- Summary Stats -->
+        <Border Grid.Row="1" 
+                BackgroundColor="#F0F7FF" 
+                Stroke="#B8D4FF" 
+                StrokeThickness="1" 
+                StrokeShape="RoundRectangle 5"
+                Padding="10">
+            <HorizontalStackLayout Spacing="5">
+                <Label x:Name="SummaryText" Text="0 classes scheduled" FontAttributes="Bold"/>
+                <Label Text=" | " TextColor="#888888"/>
+                <Label x:Name="GroupsCountText" Text="0 groups"/>
+                <Label Text=" | " TextColor="#888888"/>
+                <Label x:Name="SolosCountText" Text="0 solos"/>
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- Schedule Grid -->
+        <Border Grid.Row="2" 
+                Stroke="#E0E0E0" 
+                StrokeThickness="1" 
+                StrokeShape="RoundRectangle 5">
+            <ScrollView>
+                <VerticalStackLayout x:Name="ScheduleContainer" Spacing="0"/>
+            </ScrollView>
+        </Border>
+    </Grid>
+</ContentView>

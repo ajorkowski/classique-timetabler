@@ -1,10 +1,18 @@
 # Classique Timetabler
 
-A WPF application designed to help create optimized timetables for a dance studio using constraint programming.
+A .NET MAUI application designed to help create optimized timetables for a dance studio using constraint programming.
 
 ## Overview
 
 This program assists dance studios in scheduling classes by considering teachers, studios, students, and class types to generate an optimal timetable. It uses the Google OR-Tools CP-SAT solver to find schedules that minimize teaching time while clustering student activities and prioritizing younger students for earlier time slots.
+
+## Features
+
+- **Cross-platform foundation**: Built with .NET MAUI (currently targeting Windows)
+- **Constraint-based optimization**: Uses Google OR-Tools CP-SAT solver
+- **Visual schedule preview**: View generated schedules by day, teacher, studio, or student
+- **Auto-save**: Prevents data loss with automatic saving
+- **Flexible scheduling**: Supports both fixed-time and flexible classes
 
 ## Core Concepts
 
@@ -65,6 +73,7 @@ The application uses a tabbed interface:
 3. **Groups Tab**: Define group classes (fixed or flexible)
 4. **Students Tab**: Manage student information, group enrollments, solos, and unavailability
 5. **Generate Tab**: Configure optimization weights and generate the timetable
+6. **Results Tab**: View and explore the generated schedule
 
 ## Save and Load
 
@@ -88,10 +97,32 @@ The `.timetable` file format is a compressed JSON file:
 
 ## Technology
 
-- **Framework**: WPF (.NET 10)
+- **Framework**: .NET MAUI (.NET 10)
 - **Language**: C# 14
 - **Solver**: [Google OR-Tools CP-SAT](https://developers.google.com/optimization/cp/cp_solver)
+- **Target Platform**: Windows (with MAUI foundation for future cross-platform support)
+
+## Building
+
+### Prerequisites
+
+- .NET 10 SDK
+- Windows 10/11 (for Windows target)
+
+### Build & Run
+
+```bash
+# Build the project
+dotnet build
+
+# Run the application
+dotnet run --framework net10.0-windows10.0.19041.0
+```
 
 ## Documentation
 
 See [docs/CONSTRAINT_PROBLEM.md](docs/CONSTRAINT_PROBLEM.md) for a detailed mathematical formulation of the scheduling problem.
+
+## License
+
+This project is proprietary software for Classique Dance Studio.

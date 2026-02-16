@@ -1,14 +1,16 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace classique.timetabler
+namespace ClassiqueTimetabler.Maui;
+
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-    }
+	public App()
+	{
+		InitializeComponent();
+	}
 
+	protected override Window CreateWindow(IActivationState? activationState)
+	{
+		return new Window(new AppShell());
+	}
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:ClassiqueTimetabler.Maui.Views"
+             x:Class="ClassiqueTimetabler.Maui.Views.ResultsTab">
+    <Grid Margin="10" RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0">
+            <Label Text="Schedule Results" 
+                   FontSize="24"/>
+            <Label x:Name="ResultsInfoText" 
+                   Text="" 
+                   TextColor="#666666" 
+                   Margin="0,5,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- No Results Message -->
+        <Border x:Name="NoResultsPanel" 
+                Grid.Row="1" 
+                BackgroundColor="#F5F5F5" 
+                Stroke="#E0E0E0" 
+                StrokeThickness="1" 
+                StrokeShape="RoundRectangle 5"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Padding="40">
+            <VerticalStackLayout HorizontalOptions="Center">
+                <Label Text="No Schedule Generated" 
+                       FontSize="18" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center"
+                       TextColor="#666666"/>
+                <Label Text="Go to the Generate tab to create a timetable." 
+                       TextColor="#888888" 
+                       HorizontalOptions="Center"
+                       Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Results View -->
+        <views:ScheduleResultsView x:Name="ScheduleResultsControl" 
+                                   Grid.Row="1" 
+                                   IsVisible="False"/>
+    </Grid>
+</ContentView>

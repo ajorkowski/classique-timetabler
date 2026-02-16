@@ -1,12 +1,11 @@
-namespace classique.timetabler.Data
-{
-    public static class AppData
-    {
-        public static TimetableData Current { get; set; } = new();
+namespace ClassiqueTimetabler.Maui.Data;
 
-        public static void Reset()
-        {
-            Current = new TimetableData();
-        }
+public static class AppData
+{
+    public static TimetableData Current { get; set; } = new();
+
+    public static void Reset()
+    {
+        Current = new TimetableData();
     }
 }

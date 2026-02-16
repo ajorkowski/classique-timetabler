@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClassiqueTimetabler.Maui.Views.StudentsTab">
+    <Grid Margin="10" ColumnSpacing="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Students List -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Text="Students" 
+                   FontSize="24" 
+                   Margin="0,0,0,10"/>
+
+            <!-- Search Box -->
+            <Border Grid.Row="1" 
+                    Stroke="{StaticResource Gray200}" 
+                    StrokeShape="RoundRectangle 4"
+                    Padding="8,0"
+                    Margin="0,0,0,10">
+                <Entry x:Name="SearchEntry" 
+                       Placeholder="Search..."
+                       ClearButtonVisibility="WhileEditing"
+                       TextChanged="SearchEntry_TextChanged"/>
+            </Border>
+
+            <CollectionView Grid.Row="2" 
+                            x:Name="StudentsCollectionView"
+                            SelectionMode="Single"
+                            SelectionChanged="StudentsCollectionView_SelectionChanged"
+                            Margin="0,0,0,10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="{StaticResource Gray200}" 
+                                StrokeShape="RoundRectangle 4"
+                                Padding="10"
+                                Margin="0,0,0,5"
+                                BackgroundColor="White">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                <HorizontalStackLayout>
+                                    <Label Text="Age: " TextColor="Gray" FontSize="11"/>
+                                    <Label Text="{Binding Age}" TextColor="Gray" FontSize="11"/>
+                                    <Label Text=" | Groups: " TextColor="Gray" FontSize="11"/>
+                                    <Label Text="{Binding GroupIds.Count}" TextColor="Gray" FontSize="11"/>
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding SolosSummary}" TextColor="Gray" FontSize="11"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <HorizontalStackLayout Grid.Row="3" Spacing="10">
+                <Button Text="Add" 
+                        WidthRequest="80"
+                        Clicked="AddStudent_Clicked"/>
+                <Button Text="Remove" 
+                        WidthRequest="80"
+                        BackgroundColor="{StaticResource Gray500}"
+                        Clicked="RemoveStudent_Clicked"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Student Details / Edit Panel -->
+        <Grid Grid.Column="1" x:Name="EditPanel" IsVisible="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Text="Student Details" 
+                   FontSize="24" 
+                   Margin="0,0,0,10"/>
+
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="5">
+                    <!-- Name -->
+                    <Label Text="Name" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <Border Stroke="{StaticResource Gray200}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="8,0"
+                            Margin="0,0,0,15">
+                        <Entry x:Name="StudentNameEntry" TextChanged="StudentNameEntry_TextChanged"/>
+                    </Border>
+
+                    <!-- Year of Birth -->
+                    <Label Text="Year of Birth" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <HorizontalStackLayout Spacing="10" Margin="0,0,0,15">
+                        <Border Stroke="{StaticResource Gray200}" 
+                                StrokeShape="RoundRectangle 4"
+                                Padding="8,0"
+                                WidthRequest="120">
+                            <Entry x:Name="YearOfBirthEntry" 
+                                   Keyboard="Numeric"
+                                   TextChanged="YearOfBirthEntry_TextChanged"/>
+                        </Border>
+                        <Label x:Name="AgeDisplay" VerticalOptions="Center" TextColor="Gray"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Groups Selection -->
+                    <Label Text="Groups" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <Border Stroke="{StaticResource Gray200}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10"
+                            Margin="0,0,0,5"
+                            MinimumHeightRequest="80">
+                        <VerticalStackLayout x:Name="GroupCheckboxes" Spacing="5"/>
+                    </Border>
+                    <Label x:Name="GroupNamesDisplay" 
+                           Text="No groups selected" 
+                           TextColor="#666" 
+                           FontSize="12"
+                           Margin="0,0,0,15"/>
+
+                    <!-- Solos Section -->
+                    <Label Text="Solos" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <CollectionView x:Name="SolosCollectionView"
+                                    SelectionMode="Single"
+                                    SelectionChanged="SolosCollectionView_SelectionChanged"
+                                    HeightRequest="150"
+                                    Margin="0,0,0,5">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Stroke="{StaticResource Gray200}" 
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="10"
+                                        Margin="0,0,0,3"
+                                        BackgroundColor="White">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Text="{Binding Name}" VerticalOptions="Center"/>
+                                        <Label Grid.Column="1" Text="{Binding DurationMinutes, StringFormat='{0} min'}" TextColor="Gray" VerticalOptions="Center"/>
+                                        <Label Grid.Column="2" Text="{Binding TeacherName}" TextColor="Gray" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Solo Edit Panel -->
+                    <Border x:Name="SoloEditPanel" 
+                            Stroke="{StaticResource Primary}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10"
+                            Margin="0,0,0,5"
+                            BackgroundColor="#F8FAFC"
+                            IsVisible="False">
+                        <Grid RowSpacing="10" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Name" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0">
+                                    <Entry x:Name="SoloNameEntry" TextChanged="SoloNameEntry_TextChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Duration" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0" WidthRequest="80">
+                                    <Picker x:Name="SoloDurationPicker" SelectedIndexChanged="SoloDurationPicker_SelectedIndexChanged">
+                                        <Picker.ItemsSource>
+                                            <x:Array Type="{x:Type x:Int32}">
+                                                <x:Int32>5</x:Int32>
+                                                <x:Int32>10</x:Int32>
+                                                <x:Int32>15</x:Int32>
+                                                <x:Int32>20</x:Int32>
+                                                <x:Int32>25</x:Int32>
+                                                <x:Int32>30</x:Int32>
+                                            </x:Array>
+                                        </Picker.ItemsSource>
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2">
+                                <Label Text="Teacher" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0">
+                                    <Picker x:Name="SoloTeacherPicker" 
+                                            ItemDisplayBinding="{Binding Name}"
+                                            SelectedIndexChanged="SoloTeacherPicker_SelectedIndexChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <HorizontalStackLayout Spacing="10" Margin="0,0,0,15">
+                        <Button Text="Add Solo" WidthRequest="100" Clicked="AddSolo_Clicked"/>
+                        <Button Text="Remove Solo" WidthRequest="100" BackgroundColor="{StaticResource Gray500}" Clicked="RemoveSolo_Clicked"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Unavailability Section -->
+                    <Label Text="Unavailability" FontAttributes="Bold" Margin="0,0,0,5"/>
+                    <CollectionView x:Name="UnavailabilityCollectionView"
+                                    SelectionMode="Single"
+                                    SelectionChanged="UnavailabilityCollectionView_SelectionChanged"
+                                    HeightRequest="150"
+                                    Margin="0,0,0,5">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Stroke="{StaticResource Gray200}" 
+                                        StrokeShape="RoundRectangle 4"
+                                        Padding="10"
+                                        Margin="0,0,0,3"
+                                        BackgroundColor="White">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Text="{Binding Day}" VerticalOptions="Center"/>
+                                        <Label Grid.Column="1" Text="{Binding StartTime, StringFormat='{0:h\\:mm tt}'}" TextColor="Gray" VerticalOptions="Center"/>
+                                        <Label Grid.Column="2" Text="{Binding EndTime, StringFormat='{0:h\\:mm tt}'}" TextColor="Gray" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Unavailability Edit Panel -->
+                    <Border x:Name="UnavailabilityEditPanel" 
+                            Stroke="{StaticResource Primary}" 
+                            StrokeShape="RoundRectangle 4"
+                            Padding="10"
+                            Margin="0,0,0,5"
+                            BackgroundColor="#F8FAFC"
+                            IsVisible="False">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Day" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0">
+                                    <Picker x:Name="UnavailabilityDayPicker" SelectedIndexChanged="UnavailabilityDayPicker_SelectedIndexChanged">
+                                        <Picker.ItemsSource>
+                                            <x:Array Type="{x:Type x:String}">
+                                                <x:String>Sunday</x:String>
+                                                <x:String>Monday</x:String>
+                                                <x:String>Tuesday</x:String>
+                                                <x:String>Wednesday</x:String>
+                                                <x:String>Thursday</x:String>
+                                                <x:String>Friday</x:String>
+                                                <x:String>Saturday</x:String>
+                                            </x:Array>
+                                        </Picker.ItemsSource>
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Start" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0">
+                                    <TimePicker x:Name="UnavailabilityStartPicker" PropertyChanged="UnavailabilityStartPicker_PropertyChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2">
+                                <Label Text="End" FontSize="11" TextColor="Gray"/>
+                                <Border Stroke="{StaticResource Gray200}" StrokeShape="RoundRectangle 4" Padding="5,0">
+                                    <TimePicker x:Name="UnavailabilityEndPicker" PropertyChanged="UnavailabilityEndPicker_PropertyChanged"/>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <HorizontalStackLayout Spacing="10" Margin="0,0,0,15">
+                        <Button Text="Add Slot" WidthRequest="100" Clicked="AddUnavailability_Clicked"/>
+                        <Button Text="Remove Slot" WidthRequest="100" BackgroundColor="{StaticResource Gray500}" Clicked="RemoveUnavailability_Clicked"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentView>

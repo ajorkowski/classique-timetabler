@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView x:Class="ClassiqueTimetabler.Maui.Views.StudiosTab">
+    
+    <Grid Padding="10" RowDefinitions="Auto,*,Auto">
+        
+        <Label Text="Studios" 
+               FontSize="24" 
+               Margin="0,0,0,10"/>
+
+        <CollectionView Grid.Row="1" 
+                        x:Name="StudiosCollectionView"
+                        ItemsSource="{Binding Studios}"
+                        SelectionMode="Single"
+                        Margin="0,0,0,10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="Studio">
+                    <Border Stroke="#E0E0E0" 
+                            StrokeThickness="1" 
+                            Padding="10"
+                            Margin="0,0,0,5">
+                        <Entry Text="{Binding Name}" 
+                               Placeholder="Studio name"
+                               FontSize="16"/>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <HorizontalStackLayout Grid.Row="2" Spacing="10">
+            <Button Text="Add Studio" 
+                    WidthRequest="120" 
+                    HeightRequest="40"
+                    Clicked="AddStudio_Clicked"/>
+            <Button Text="Remove" 
+                    WidthRequest="100" 
+                    HeightRequest="40"
+                    Clicked="RemoveStudio_Clicked"/>
+        </HorizontalStackLayout>
+        
+    </Grid>
+    
+</ContentView>
